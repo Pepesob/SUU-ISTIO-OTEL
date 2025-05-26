@@ -107,3 +107,14 @@ https://cloud.google.com/learn/what-is-istio
 https://boringowl.io/blog/istio-wprowadzenie-do-zarzadzania-uslugami-w-srodowisku-mikrouslug
 https://www.youtube.com/watch?v=iEEIabOha8U
 
+
+## TEMPORARY
+
+make generate-kubernetes-manifests
+kubectl create --namespace otel-demo -f kubernetes/opentelemetry-demo.yaml
+kubectl delete -f kubernetes/opentelemetry-demo.yaml
+kubectl apply --namespace otel-demo -f kubernetes/cart-deployment.yaml
+kubectl apply --namespace otel-demo -f kubernetes/cart-ds.yaml
+kubectl apply --namespace otel-demo -f kubernetes/cart-ds.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/addons/kiali.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/addons/prometheus.yaml

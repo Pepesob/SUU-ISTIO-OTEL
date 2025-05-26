@@ -1,0 +1,18 @@
+# VirtualService with canary traffic splitting
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: cart
+spec:
+  hosts:
+    - cart
+  http:
+    - route:
+        - destination:
+            host: cart
+            subset: v1
+          weight: 90
+        - destination:
+            host: cart
+            subset: v2
+          weight: 10
