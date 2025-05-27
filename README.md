@@ -70,23 +70,23 @@ rescource: https://opentelemetry.io/docs/demo/architecture/
     - [istioctl](https://istio.io/latest/docs/setup/install/istioctl/)
     - [helm](https://helm.sh/docs/intro/quickstart/)
     - helpful for local deployment: [k9s](https://k9scli.io/)
-```
+<!-- ```
 helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
-```
+``` -->
 ```
 minikube start
 ```
 ```
 istioctl manifest apply --set profile=demo
 ```
-```
+<!-- ```
 kubectl label namespace default istio-injection=enabled
-```
-```
+``` -->
+<!-- ```
 helm install my-otel-demo open-telemetry/opentelemetry-demo
+``` -->
 ```
-```
-kubectl --namespace default port-forward svc/frontend-proxy 8080:8080
+kubectl --namespace otel-demo port-forward svc/frontend-proxy 8080:8080
 ```
 ### Making changes to configuration
 - save configuration
@@ -95,12 +95,12 @@ helm show values open-telemetry/opentelemetry-demo > custom-values.yaml
 ```
 - edit `cutom-values.yaml` file
 - restart demo
-```
+<!-- ```
 helm uninstall my-otel-demo
-```
-```
+``` -->
+<!-- ```
 helm install my-otel-demo open-telemetry/opentelemetry-demo -f custom-values.yaml
-```
+``` -->
 
 ## Bibliography:
 https://cloud.google.com/learn/what-is-istio
@@ -110,18 +110,28 @@ https://www.youtube.com/watch?v=iEEIabOha8U
 
 ## TEMPORARY
 
+<!-- Jeśli edycja zaszła w helm chart (custom_values.yaml) to należy stworzyć kubernetes manifesty na nowo -->
 make generate-kubernetes-manifests
 
+<!-- komendy działają z tego folderu -->
+cd opentelemetry-demo
+
+<!-- Deploy podstawowych mikroserwisów -->
 kubectl create --namespace otel-demo -f kubernetes/opentelemetry-demo.yaml
 
+<!-- Usunięcie podstawowych mikroserwisów -->
 kubectl delete -f kubernetes/opentelemetry-demo.yaml
 
+<!-- Deploy cart service -->
 kubectl apply --namespace otel-demo -f kubernetes/cart-deployment.yaml
 
-kubectl apply --namespace otel-demo -f kubernetes/cart-ds.yaml
+<!-- Usunięcie cart service -->
+kubectl delete -f kubernetes/cart-deployment.yaml
 
+<!-- Destination rule i Virtual service dla cart dla canary deployment -->
 kubectl apply --namespace otel-demo -f kubernetes/cart-ds.yaml
+kubectl apply --namespace otel-demo -f kubernetes/cart-vs.yaml
 
+<!-- To jak chcemy dodać kiali do  -->
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/addons/kiali.yaml
-
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/addons/prometheus.yaml
