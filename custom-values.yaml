@@ -488,9 +488,6 @@ components:
     enabled: false
     useDefault:
       env: true
-    imageOverride:
-      pullPolicy: Never
-      tag: latest-product-catalog
     service:
       port: 8080
     env:
