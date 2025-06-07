@@ -143,3 +143,9 @@ kubectl label namespace default istio-injection-
 
 Zmiany zaszły w opentelemetry-demo/src/cart/src, dodano zmienną artificialDelayMs która jest zczytywana ze zmiennych środowiskowych, jest to sztuczne opóźnienie wszystkich metod CartService
 
+<!-- Budowanie lokalnego serwisu cart -->
+cd opentelemetry-demo
+minikube start
+eval $(minikube -p minikube docker-env)
+docker compose build cart
+
