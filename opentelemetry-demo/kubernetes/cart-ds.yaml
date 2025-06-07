@@ -9,6 +9,8 @@ spec:
     - name: v1
       labels:
         version: v1
+        service.istio.io/canonical-revision: v1
     - name: v2
       labels:
         version: v2
+        service.istio.io/canonical-revision: v2

@@ -70,37 +70,9 @@ rescource: https://opentelemetry.io/docs/demo/architecture/
     - [istioctl](https://istio.io/latest/docs/setup/install/istioctl/)
     - [helm](https://helm.sh/docs/intro/quickstart/)
     - helpful for local deployment: [k9s](https://k9scli.io/)
-<!-- ```
-helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
-``` -->
-```
-minikube start
-```
-```
-istioctl manifest apply --set profile=demo
-```
-<!-- ```
-kubectl label namespace default istio-injection=enabled
-``` -->
-<!-- ```
-helm install my-otel-demo open-telemetry/opentelemetry-demo
-``` -->
-```
-kubectl --namespace otel-demo port-forward svc/frontend-proxy 8080:8080
-```
+
 ### Making changes to configuration
-- save configuration
-```
-helm show values open-telemetry/opentelemetry-demo > custom-values.yaml
-```
-- edit `cutom-values.yaml` file
-- restart demo
-<!-- ```
-helm uninstall my-otel-demo
-``` -->
-<!-- ```
-helm install my-otel-demo open-telemetry/opentelemetry-demo -f custom-values.yaml
-``` -->
+
 
 ## Bibliography:
 https://cloud.google.com/learn/what-is-istio
@@ -111,27 +83,63 @@ https://www.youtube.com/watch?v=iEEIabOha8U
 ## TEMPORARY
 
 <!-- Jeśli edycja zaszła w helm chart (custom_values.yaml) to należy stworzyć kubernetes manifesty na nowo -->
+<!-- Po uruchomieniu tej komendy, trzeba ręcznie wyłączyć sidecar injection w Deployment jaeger (dodać spec:template:annotations: sidecar.istio.io/inject: "false") -->
+
 make generate-kubernetes-manifests
 
 <!-- komendy działają z tego folderu -->
 cd opentelemetry-demo
 
-<!-- Deploy podstawowych mikroserwisów -->
-kubectl create --namespace otel-demo -f kubernetes/opentelemetry-demo.yaml
+<!-- Włączenie minikube -->
+minikube start
 
-<!-- Usunięcie podstawowych mikroserwisów -->
+<!-- Instalacja istio w klastrze kubernetes -->
+istioctl manifest apply --set profile=demo
+
+<!-- kubectl label namespace default istio-injection=enabled - tego zdaje się nie trzeba bo jest w manifeście kubernetesowym na samym początku ale głowy za to nie dam -->
+
+<!-- Deploy podstawowych mikroserwisów -->
+kubectl create -f kubernetes/opentelemetry-demo.yaml
+
 kubectl delete -f kubernetes/opentelemetry-demo.yaml
 
 <!-- Deploy cart service -->
-kubectl apply --namespace otel-demo -f kubernetes/cart-deployment.yaml
+kubectl apply -f kubernetes/cart-deployment.yaml
 
-<!-- Usunięcie cart service -->
 kubectl delete -f kubernetes/cart-deployment.yaml
 
 <!-- Destination rule i Virtual service dla cart dla canary deployment -->
-kubectl apply --namespace otel-demo -f kubernetes/cart-ds.yaml
-kubectl apply --namespace otel-demo -f kubernetes/cart-vs.yaml
+<!-- Aby dostosować ruch pomiędzy wersjami wystarczy edytować weight w pliku opentelemetry-demo/kubernetes/cart-canary.yaml a następnie zastosować zmiany -->
+kubectl apply -f kubernetes/cart-canary.yaml
 
-<!-- To jak chcemy dodać kiali do  -->
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/addons/kiali.yaml
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/addons/prometheus.yaml
+kubectl delete -f kubernetes/cart-canary.yaml
+
+<!-- Port froward aby mieć dostęp do narzędzi wewnątrz klastra -->
+kubectl port-forward svc/frontend-proxy 8080:8080
+
+<!-- Do benchmarku użyto komendy hey -->
+go install github.com/rakyll/hey@latest
+
+hey -n 1000000 -c 5 "http://localhost:8080/api/cart"
+
+
+<!-- Metryki opentelemetry-collector -> prometeusz (query language) -> grafana
+<!-- ilość zapytań powyżej 1s -->
+sum(rate(traces_span_metrics_duration_milliseconds_bucket{le="+Inf",span_name="POST /oteldemo.CartService/GetCart"}[2m])) 
+- 
+sum(rate(traces_span_metrics_duration_milliseconds_bucket{le="1000",span_name="POST /oteldemo.CartService/GetCart"}[2m]))
+
+<!-- Ilość zapytań poniżej 1s -->
+sum(rate(traces_span_metrics_duration_milliseconds_bucket{le="1000",span_name="POST /oteldemo.CartService/GetCart"}[2m]))
+
+
+<!-- Czyszczenie wszystkiego -->
+kubectl delete -f kubernetes/cart-deployment.yaml
+kubectl delete -f kubernetes/cart-canary.yaml
+kubectl delete -f kubernetes/opentelemetry-demo.yaml
+istioctl uninstall -y --purge
+kubectl delete namespace istio-system
+kubectl label namespace default istio-injection-
+
+Zmiany zaszły w opentelemetry-demo/src/cart/src, dodano zmienną artificialDelayMs która jest zczytywana ze zmiennych środowiskowych, jest to sztuczne opóźnienie wszystkich metod CartService
+

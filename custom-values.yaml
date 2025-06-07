@@ -460,6 +460,8 @@ components:
     resources:
       limits:
         memory: 1500Mi
+    # podAnnotations:
+    #   sidecar.istio.io/inject: "false"
 
   payment:
     enabled: false
@@ -485,7 +487,7 @@ components:
       runAsNonRoot: true
 
   product-catalog:
-    enabled: false
+    enabled: true
     useDefault:
       env: true
     service:
@@ -573,7 +575,7 @@ components:
         memory: 20Mi
 
   flagd:
-    enabled: false
+    enabled: true
     imageOverride:
       repository: "ghcr.io/open-feature/flagd"
       tag: "v0.11.1"
@@ -812,6 +814,8 @@ jaeger:
     resources:
       limits:
         memory: 400Mi
+    podAnnotations:
+      sidecar.istio.io/inject: "false"
   storage:
     type: memory
   agent:
@@ -957,7 +961,7 @@ grafana:
       memory: 150Mi
 
 opensearch:
-  enabled: true
+  enabled: false
   fullnameOverride: opensearch
   clusterName: demo-cluster
   nodeGroup: otel-demo

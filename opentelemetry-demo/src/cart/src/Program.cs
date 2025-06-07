@@ -21,6 +21,7 @@ using OpenFeature.Contrib.Hooks.Otel;
 
 var builder = WebApplication.CreateBuilder(args);
 string valkeyAddress = builder.Configuration["VALKEY_ADDR"];
+int artificialDelayMs = int.Parse(builder.Configuration["ARTIFICIAL_DELAY_MS"]);
 if (string.IsNullOrEmpty(valkeyAddress))
 {
     Console.WriteLine("VALKEY_ADDR environment variable is required.");
@@ -49,7 +50,8 @@ builder.Services.AddSingleton(x =>
     new CartService(
         x.GetRequiredService<ICartStore>(),
         new ValkeyCartStore(x.GetRequiredService<ILogger<ValkeyCartStore>>(), "badhost:1234"),
-        x.GetRequiredService<IFeatureClient>()
+        x.GetRequiredService<IFeatureClient>(),
+        artificialDelayMs
 ));
 
 
@@ -90,6 +92,7 @@ app.MapGrpcHealthChecksService();
 
 app.MapGet("/", async context =>
 {
+    Thread.Sleep(artificialDelayMs);
     await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 });
 

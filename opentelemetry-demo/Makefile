@@ -158,10 +158,10 @@ generate-kubernetes-manifests:
 	echo "apiVersion: v1" >> kubernetes/opentelemetry-demo.yaml
 	echo "kind: Namespace" >> kubernetes/opentelemetry-demo.yaml
 	echo "metadata:" >> kubernetes/opentelemetry-demo.yaml
-	echo "  name: otel-demo" >> kubernetes/opentelemetry-demo.yaml
+	echo "  name: default" >> kubernetes/opentelemetry-demo.yaml
 	echo "  labels:" >> kubernetes/opentelemetry-demo.yaml
 	echo "    istio-injection: enabled" >> kubernetes/opentelemetry-demo.yaml
-	helm template opentelemetry-demo open-telemetry/opentelemetry-demo --namespace otel-demo -f ../custom-values.yaml | sed '/helm.sh\/chart\:/d' | sed '/helm.sh\/hook/d' | sed '/managed-by\: Helm/d' >> kubernetes/opentelemetry-demo.yaml
+	helm template opentelemetry-demo open-telemetry/opentelemetry-demo --namespace default -f ../custom-values.yaml | sed '/helm.sh\/chart\:/d' | sed '/helm.sh\/hook/d' | sed '/managed-by\: Helm/d' >> kubernetes/opentelemetry-demo.yaml
 
 .PHONY: docker-generate-protobuf
 docker-generate-protobuf:

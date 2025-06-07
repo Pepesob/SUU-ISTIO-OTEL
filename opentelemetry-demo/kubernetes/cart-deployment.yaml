@@ -14,7 +14,7 @@ spec:
   type: ClusterIP
   ports:
     - port: 8080
-      name: tcp-service
+      name: grpc
       targetPort: 8080
   selector:
     
@@ -55,7 +55,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: cart
-          image: 'ghcr.io/open-telemetry/demo:2.0.2-cart'
+          image: 'ghcr.io/open-telemetry/demo:latest-cart'
           imagePullPolicy: IfNotPresent
           ports:
             
@@ -85,6 +85,8 @@ spec:
               value: http://$(OTEL_COLLECTOR_NAME):4317
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: service.name=$(OTEL_SERVICE_NAME),service.namespace=opentelemetry-demo,service.version=2.0.2
+            - name: ARTIFICIAL_DELAY_MS
+              value: "1"
           resources:
             limits:
               memory: 160Mi
@@ -134,10 +136,9 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: cart
-          image: 'ghcr.io/open-telemetry/demo:2.0.2-cart'
+          image: 'ghcr.io/open-telemetry/demo:latest-cart'
           imagePullPolicy: IfNotPresent
           ports:
-            
             - containerPort: 8080
               name: service
           env:
@@ -164,6 +165,8 @@ spec:
               value: http://$(OTEL_COLLECTOR_NAME):4317
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: service.name=$(OTEL_SERVICE_NAME),service.namespace=opentelemetry-demo,service.version=2.0.2
+            - name: ARTIFICIAL_DELAY_MS
+              value: "1000"
           resources:
             limits:
               memory: 160Mi

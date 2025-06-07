@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Threading;
 using System;
 using Grpc.Core;
 using cart.cartstore;
@@ -17,16 +18,20 @@ public class CartService : Oteldemo.CartService.CartServiceBase
     private readonly ICartStore _badCartStore;
     private readonly ICartStore _cartStore;
     private readonly IFeatureClient _featureFlagHelper;
+    private readonly int _artificialDelay;
 
-    public CartService(ICartStore cartStore, ICartStore badCartStore, IFeatureClient featureFlagService)
+    public CartService(ICartStore cartStore, ICartStore badCartStore, IFeatureClient featureFlagService, int artificialDelay)
     {
         _badCartStore = badCartStore;
         _cartStore = cartStore;
         _featureFlagHelper = featureFlagService;
+        _artificialDelay = artificialDelay;
     }
 
     public override async Task<Empty> AddItem(AddItemRequest request, ServerCallContext context)
-    {
+    {   
+        Thread.Sleep(_artificialDelay);
+        Console.WriteLine(_artificialDelay);
         var activity = Activity.Current;
         activity?.SetTag("app.user.id", request.UserId);
         activity?.SetTag("app.product.id", request.Item.ProductId);
@@ -47,7 +52,8 @@ public class CartService : Oteldemo.CartService.CartServiceBase
     }
 
     public override async Task<Cart> GetCart(GetCartRequest request, ServerCallContext context)
-    {
+    {   
+        Thread.Sleep(_artificialDelay); 
         var activity = Activity.Current;
         activity?.SetTag("app.user.id", request.UserId);
         activity?.AddEvent(new("Fetch cart"));
@@ -74,6 +80,7 @@ public class CartService : Oteldemo.CartService.CartServiceBase
 
     public override async Task<Empty> EmptyCart(EmptyCartRequest request, ServerCallContext context)
     {
+        Thread.Sleep(_artificialDelay); 
         var activity = Activity.Current;
         activity?.SetTag("app.user.id", request.UserId);
         activity?.AddEvent(new("Empty cart"));
