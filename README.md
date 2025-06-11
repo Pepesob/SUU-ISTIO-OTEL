@@ -64,6 +64,30 @@ rescource: https://opentelemetry.io/docs/demo/architecture/
 ## Solution architecture
 
 ## Environment configuration description
+Although solution architecture is taken from OpenTelemetry Demo, some changes had to be applied to its configuration. As described above, in order to allow for local deployment whole system had to be stripped down. Configuraion is held in `custom-values.yaml` file. It needed some modifications to disable services (just set `enabled: false`), the only enabled are:
+- frontend proxy,
+- frontend,
+- flagd-ui,
+- cache,
+- flagd,
+- product catalog,
+- cart.
+
+In order to show the canary deployment there were two versions of Cart Service. To differenciate them artificial delay is being added.
+
+![cart-delay](https://github.com/user-attachments/assets/cee5b5e2-cdbb-43c7-aaa1-bc1f652badae)
+
+Before performing its action, cart sleeps for `artificialDelay` seconds. Value is read from environmental variable
+
+![cart-delay-env](https://github.com/user-attachments/assets/4da2ccf8-2dd0-4adb-be01-51546c8ed8cb)
+
+and value itself is set in `cart-deployment.yaml` file.
+
+![image](https://github.com/user-attachments/assets/80a0d35e-f584-43ef-8744-ae7a70434d18)
+
+In our case, we've set up two Carts, one with 1ms and one with 1000ms delay.
+
+
 
 ## Instalation method:
 - install:
