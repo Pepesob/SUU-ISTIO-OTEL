@@ -63,6 +63,14 @@ rescource: https://opentelemetry.io/docs/demo/architecture/
 
 ## Solution architecture
 
+The chosen architecture is based on the demo of microservice-based distributed system described on the offical Open Telemetry docs page, which can be found at [https://opentelemetry.io/docs/demo/architecture/](https://opentelemetry.io/docs/demo/architecture/). This is a real-world example of Open Telemetry's potential and is presented below:
+
+![original architecture](/img/architecture-original.png)
+
+The above architecture has been modified. All of the services except Cart were deleted due to limited resources, improving the performance of the application and increasing the clarity of the presented case study. Also additional, much slower version of Cart service was created. The final modified architecture is shown below:
+
+![modified architecture](/img/architecture-modified.png)
+
 ## Environment configuration description
 
 ## Instalation method:
