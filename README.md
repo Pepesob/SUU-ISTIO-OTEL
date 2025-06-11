@@ -93,6 +93,10 @@ cd opentelemetry-demo
 <!-- Włączenie minikube -->
 minikube start
 
+<!-- Budowa cart service -->
+eval $(minikube docker-env)
+docker compose build cart
+
 <!-- Instalacja istio w klastrze kubernetes -->
 istioctl manifest apply --set profile=demo
 
