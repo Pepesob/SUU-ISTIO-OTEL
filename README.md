@@ -65,20 +65,87 @@ rescource: https://opentelemetry.io/docs/demo/architecture/
 
 ## Environment configuration description
 
-### Instalation method:
+## Instalation method:
 - install:
     - [istioctl](https://istio.io/latest/docs/setup/install/istioctl/)
     - [helm](https://helm.sh/docs/intro/quickstart/)
     - helpful for local deployment: [k9s](https://k9scli.io/)
-
+```
+helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+```
+```
+minikube start
+```
+```
+istioctl manifest apply --set profile=demo
+```
+```
+kubectl label namespace default istio-injection=enabled
+```
+```
+helm install my-otel-demo open-telemetry/opentelemetry-demo
+```
+```
+kubectl --namespace default port-forward svc/frontend-proxy 8080:8080
+```
 ### Making changes to configuration
+- save configuration
+```
+helm show values open-telemetry/opentelemetry-demo > custom-values.yaml
+```
+- edit `cutom-values.yaml` file
+- restart demo
+```
+helm uninstall my-otel-demo
+```
+```
+helm install my-otel-demo open-telemetry/opentelemetry-demo -f custom-values.yaml
+```
+## How to reproduce
 
+## Demo deployment steps
+### Configuration setup
+Whole setup configuration is held in `custom-values.yaml` file. Here's its overview:
+- image: the official [OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo) - microservice-based distributed Astronomy Shop,
+- components: stripped-down to crucial ones, to allow for deployment on less-powerful machines (locally),
+    - `opentelemetry-collector` - collects data across whole system, processes and exports it,
+    - `jaeger` - allows for capturing traces,
+    - `prometheus` - uses OpenTelemetry and Jaeger as data sources, provides querying capabilities, allows for data analysis
+    - `grafana` - provides a platform for visualization and analysis data stored by Prometheus.
+Canary deployment has been tested in a few load distribution setups.
+### Data preparation
+### Execution procedure
+### Results presentation
+Charts below show number of queries that take over 1s (green) and these that take less than 1s (orange)
+<figure>
+  <img src="/img/canary-0-100.png" alt="">
+  <figcaption>Weights 0/100</figcaption>
+</figure>
+<figure>
+  <img src="/img/canary-30-70.png" alt="">
+  <figcaption>Weights 30/70</figcaption>
+</figure>
+<figure>
+  <img src="/img/canary-50-50.png" alt="">
+  <figcaption>Weights 50/50</figcaption>
+</figure>
+<figure>
+  <img src="/img/canary-70-30.png" alt="">
+  <figcaption>Weights 70/30</figcaption>
+</figure>
+<figure>
+  <img src="/img/canary-100-0.png" alt="">
+  <figcaption>Weights 100/0</figcaption>
+</figure>
+
+## Using AI in the project
+
+## Summary - conclusion
 
 ## Bibliography:
 https://cloud.google.com/learn/what-is-istio
 https://boringowl.io/blog/istio-wprowadzenie-do-zarzadzania-uslugami-w-srodowisku-mikrouslug
 https://www.youtube.com/watch?v=iEEIabOha8U
-
 
 ## TEMPORARY
 
