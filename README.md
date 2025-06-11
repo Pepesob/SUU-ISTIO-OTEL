@@ -113,30 +113,25 @@ Whole setup configuration is held in `custom-values.yaml` file. Here's its overv
     - `prometheus` - uses OpenTelemetry and Jaeger as data sources, provides querying capabilities, allows for data analysis
     - `grafana` - provides a platform for visualization and analysis data stored by Prometheus.
 Canary deployment has been tested in a few load distribution setups.
+
 ### Data preparation
+
 ### Execution procedure
+
 ### Results presentation
 Charts below show number of queries that take over 1s (green) and these that take less than 1s (orange)
-<figure>
-  <img src="/img/canary-0-100.png" alt="">
-  <figcaption>Weights 0/100</figcaption>
-</figure>
-<figure>
-  <img src="/img/canary-30-70.png" alt="">
-  <figcaption>Weights 30/70</figcaption>
-</figure>
-<figure>
-  <img src="/img/canary-50-50.png" alt="">
-  <figcaption>Weights 50/50</figcaption>
-</figure>
-<figure>
-  <img src="/img/canary-70-30.png" alt="">
-  <figcaption>Weights 70/30</figcaption>
-</figure>
-<figure>
-  <img src="/img/canary-100-0.png" alt="">
-  <figcaption>Weights 100/0</figcaption>
-</figure>
+
+#### Weights 0/100
+![canary 0/100](/img/canary-0-100.png)
+#### Weight 30/70
+![canary 30/70](/img/canary-30-70.png)
+#### Weight 50/50
+![canary 50/50](/img/canary-50-50.png)
+#### Weight 70/30
+![canary 70/30](/img/canary-70-30.png)
+#### Weight 100/0
+![canary 100/0](/img/canary-100-0.png)
+
 
 ## Using AI in the project
 
