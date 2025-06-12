@@ -103,10 +103,16 @@ In our case, we've set up two Carts, one with 1ms and one with 1000ms delay.
     - [helm](https://helm.sh/docs/intro/quickstart/)
     - helpful for local deployment: [k9s](https://k9scli.io/)
 ```
-helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+cd opentelemetry-demo
 ```
 ```
 minikube start
+```
+```
+eval $(minikube docker-env)
+```
+```
+docker compose build cart
 ```
 ```
 istioctl manifest apply --set profile=demo
@@ -115,23 +121,35 @@ istioctl manifest apply --set profile=demo
 kubectl label namespace default istio-injection=enabled
 ```
 ```
-helm install my-otel-demo open-telemetry/opentelemetry-demo
+kubectl create -f kubernetes/opentelemetry-demo.yaml
+```
+```
+kubectl apply -f kubernetes/cart-deployment.yaml
+```
+```
+kubectl apply -f kubernetes/cart-canary.yaml
 ```
 ```
 kubectl --namespace default port-forward svc/frontend-proxy 8080:8080
 ```
-### Making changes to configuration
-- save configuration
+## Cleanup
 ```
-helm show values open-telemetry/opentelemetry-demo > custom-values.yaml
-```
-- edit `cutom-values.yaml` file
-- restart demo
-```
-helm uninstall my-otel-demo
+kubectl delete -f kubernetes/cart-deployment.yaml
 ```
 ```
-helm install my-otel-demo open-telemetry/opentelemetry-demo -f custom-values.yaml
+kubectl delete -f kubernetes/cart-canary.yaml
+```
+```
+kubectl delete -f kubernetes/opentelemetry-demo.yaml
+```
+```
+istioctl uninstall -y --purge
+```
+```
+kubectl delete namespace istio-system
+```
+```
+kubectl label namespace default istio-injection-
 ```
 ## How to reproduce
 
@@ -146,7 +164,20 @@ Whole setup configuration is held in `custom-values.yaml` file. Here's its overv
     - `grafana` - provides a platform for visualization and analysis data stored by Prometheus.
 Canary deployment has been tested in a few load distribution setups.
 
-### Data preparation
+### Metrics
+
+Requests to CartService/GetCart longer than 1s:
+```
+sum(rate(traces_span_metrics_duration_milliseconds_bucket{le="+Inf",span_name="POST /oteldemo.CartService/GetCart"}[2m])) 
+- 
+sum(rate(traces_span_metrics_duration_milliseconds_bucket{le="1000",span_name="POST /oteldemo.CartService/GetCart"}[2m]))
+```
+
+Requests to CartService/GetCart shorter than 1s:
+
+```
+sum(rate(traces_span_metrics_duration_milliseconds_bucket{le="1000",span_name="POST /oteldemo.CartService/GetCart"}[2m]))
+```
 
 ### Execution procedure
 
