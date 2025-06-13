@@ -71,6 +71,11 @@ The above architecture has been modified. All of the services except Cart were d
 
 ![modified architecture](/img/architecture-modified.png)
 
+### Telemetry data flow
+Whole system is being monitored by OpenTelemetry. Microservices communicate with OTel Collector which feeds data into Prometheus and Jaeger. To display gained data, Grafana is used. Data can also be accessed directly from Prometheus or Jaeger via their UI (e.g. traces).
+<img width="873" alt="image" src="https://github.com/user-attachments/assets/a9e02e45-bd45-4365-a01c-ea038b897787" />
+
+
 ## Environment configuration description
 Although solution architecture is taken from OpenTelemetry Demo, some changes had to be applied to its configuration. As described above, in order to allow for local deployment whole system had to be stripped down. Configuraion is held in `custom-values.yaml` file. It needed some modifications to disable services (just set `enabled: false`), the only enabled are:
 - frontend proxy,
@@ -195,10 +200,21 @@ Charts below show number of queries that take over 1s (green) and these that tak
 #### Weight 100/0
 ![canary 100/0](/img/canary-100-0.png)
 
+#### Traces
+Traces from Jaeger UI with 50/50 canary deployment configuration
+![image](https://github.com/user-attachments/assets/a07a478f-68e1-46e4-87a9-5ba0e1e6d77f)
+
+##### "Fast" cart (1ms delay)
+![image](https://github.com/user-attachments/assets/ca6e642c-aad9-47de-aeaf-4e8aef2e5d4f)
+##### "Slow" cart (1000ms delay)
+![image](https://github.com/user-attachments/assets/ec5a50e5-2edf-445a-bc63-5a8ec8e30462)
+
 
 ## Using AI in the project
+AI haven't been used in the project too much. We've used LLMs as a starting point to further reasearch/development, but they weren't always relevant. Also, the topic of Istio and OTel is well documented, so usually it was easier to find information directly, using the browser search.
 
 ## Summary - conclusion
+The project have been educative. It showed us OpenTelemetry, which allowed to discover ourselves how canary deployment works. Althought it worked just fine, it turned out that deploying whole OTel Demo app on our hardware wasn't that easy - it'd quite a resource-heave environment. We've had to strip it down significantly to make it work at all. 
 
 ## Bibliography:
 https://cloud.google.com/learn/what-is-istio
